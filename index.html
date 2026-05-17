@@ -1,807 +1,492 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bano Qabil — Batch 2 Timetable</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --green: #2ECC71;
-    --green-dark: #27AE60;
-    --green-light: #ABEBC6;
-    --teal: #1ABC9C;
-    --navy: #0D1B2A;
-    --navy2: #162231;
-    --card: #1B2A3B;
-    --card2: #213344;
-    --border: #2A3F55;
-    --text: #E8F4F8;
-    --muted: #7FA8C0;
-    --male: #5DADE2;
-    --female: #F1948A;
-    --accent: #F39C12;
-    --lab-bg: #1E3050;
-    --class-bg: #1E2E40;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--navy);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-  }
-
-  /* ── HEADER ── */
-  header {
-    background: linear-gradient(135deg, #0D1B2A 0%, #162231 60%, #1B3A2A 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 18px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-  .logo-block { display: flex; align-items: center; gap: 14px; }
-  .logo-mark {
-    width: 44px; height: 44px;
-    background: linear-gradient(135deg, var(--green), var(--teal));
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Syne', sans-serif;
-    font-weight: 800; font-size: 20px; color: #fff;
-  }
-  .logo-text h1 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
-  .logo-text p { font-size: 12px; color: var(--muted); margin-top: 1px; }
-
-  .header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-  .btn {
-    padding: 9px 18px; border-radius: 8px; font-family: 'DM Sans', sans-serif;
-    font-size: 13px; font-weight: 600; cursor: pointer; border: none;
-    transition: all 0.2s; display: flex; align-items: center; gap: 6px;
-  }
-  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); }
-  .btn-outline:hover { border-color: var(--green); color: var(--green); }
-  .btn-primary { background: var(--green); color: #fff; }
-  .btn-primary:hover { background: var(--green-dark); transform: translateY(-1px); }
-  .btn-danger { background: #E74C3C; color: #fff; }
-  .btn-danger:hover { background: #c0392b; }
-
-  /* ── TABS ── */
-  .tabs-bar {
-    padding: 0 32px;
-    background: var(--navy2);
-    border-bottom: 1px solid var(--border);
-    display: flex; gap: 0;
-  }
-  .tab {
-    padding: 14px 24px; font-family: 'Syne', sans-serif; font-weight: 600;
-    font-size: 14px; cursor: pointer; border-bottom: 3px solid transparent;
-    color: var(--muted); transition: all 0.2s; white-space: nowrap;
-  }
-  .tab.active { color: var(--green); border-bottom-color: var(--green); }
-  .tab:hover:not(.active) { color: var(--text); }
-
-  /* ── SUMMARY CARDS ── */
-  .summary-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 14px; padding: 24px 32px 0;
-  }
-  .stat-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px 18px;
-    position: relative; overflow: hidden;
-  }
-  .stat-card::before {
-    content: ''; position: absolute; top: 0; left: 0;
-    width: 4px; height: 100%; border-radius: 12px 0 0 12px;
-  }
-  .stat-card.s-total::before { background: var(--green); }
-  .stat-card.s-male::before { background: var(--male); }
-  .stat-card.s-female::before { background: var(--female); }
-  .stat-card.s-courses::before { background: var(--accent); }
-  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; }
-  .stat-value { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; margin: 4px 0 2px; }
-  .stat-sub { font-size: 12px; color: var(--muted); }
-
-  /* ── CHARTS SECTION ── */
-  .charts-row {
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 16px;
-    padding: 20px 32px 0;
-  }
-  .chart-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-  }
-  .chart-title {
-    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px;
-    color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 16px;
-  }
-
-  /* Bar chart */
-  .bar-chart { display: flex; flex-direction: column; gap: 10px; }
-  .bar-row { display: flex; align-items: center; gap: 10px; }
-  .bar-label { font-size: 12px; color: var(--muted); width: 130px; flex-shrink: 0; font-weight: 500; }
-  .bar-track { flex: 1; height: 20px; background: var(--navy2); border-radius: 4px; overflow: visible; position: relative; cursor: pointer; }
-  .bar-fill-m { height: 100%; background: var(--male); border-radius: 4px 0 0 4px; display: inline-block; transition: width 0.4s ease; }
-  .bar-fill-f { height: 100%; background: var(--female); border-radius: 0 4px 4px 0; display: inline-block; transition: width 0.4s ease; }
-  .bar-val { font-size: 12px; color: var(--text); min-width: 36px; text-align: right; font-weight: 600; }
-
-  /* Tooltip */
-  .tooltip {
-    position: fixed; background: var(--navy); border: 1px solid var(--green);
-    border-radius: 8px; padding: 10px 14px; font-size: 12px;
-    pointer-events: none; z-index: 1000; opacity: 0; transition: opacity 0.15s;
-    min-width: 160px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-  }
-  .tooltip.show { opacity: 1; }
-  .tooltip-title { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 6px; color: var(--green); }
-  .tooltip-row { display: flex; justify-content: space-between; gap: 12px; margin: 2px 0; }
-  .tooltip-key { color: var(--muted); }
-  .tooltip-val { font-weight: 600; }
-
-  /* Donut chart */
-  .donut-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
-  #donut-svg { width: 140px; height: 140px; }
-  .donut-legend { display: flex; gap: 20px; justify-content: center; }
-  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
-  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
-
-  /* ── MAIN SCHEDULE ── */
-  .campus-section { padding: 24px 32px; display: none; }
-  .campus-section.active { display: block; }
-
-  .room-block { margin-bottom: 28px; }
-  .room-header {
-    display: flex; align-items: center; gap: 10px;
-    margin-bottom: 12px;
-  }
-  .room-title {
-    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px;
-  }
-  .room-badge {
-    font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 600;
-  }
-  .room-badge.lab { background: rgba(91,173,226,0.15); color: var(--male); border: 1px solid rgba(91,173,226,0.3); }
-  .room-badge.classroom { background: rgba(243,156,18,0.12); color: var(--accent); border: 1px solid rgba(243,156,18,0.3); }
-  .room-cap { font-size: 12px; color: var(--muted); margin-left: auto; }
-
-  .schedule-grid {
-    display: grid;
-    grid-template-columns: 80px repeat(6, 1fr);
-    gap: 4px;
-  }
-  .grid-header {
-    background: var(--card2); border: 1px solid var(--border);
-    border-radius: 6px; padding: 8px 6px; text-align: center;
-    font-size: 11px; font-weight: 700; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 0.5px;
-  }
-  .time-label {
-    background: transparent; border: none;
-    display: flex; align-items: center; justify-content: flex-end;
-    padding-right: 8px; font-size: 11px; color: var(--muted);
-    font-weight: 600; min-height: 58px;
-  }
-
-  .slot {
-    border-radius: 8px; border: 1px solid var(--border);
-    padding: 8px 8px; min-height: 58px;
-    display: flex; flex-direction: column; justify-content: center;
-    cursor: pointer; transition: all 0.18s; position: relative;
-    overflow: hidden;
-  }
-  .slot:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
-  .slot.empty { background: var(--card2); opacity: 0.5; border-style: dashed; }
-  .slot.empty:hover { opacity: 0.8; border-color: var(--green); }
-  .slot.male { background: linear-gradient(135deg, #1B3A50 0%, #152A3A 100%); border-color: rgba(91,173,226,0.35); }
-  .slot.female { background: linear-gradient(135deg, #3A1B25 0%, #2A1520 100%); border-color: rgba(241,148,138,0.35); }
-
-  .slot-course { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; }
-  .slot-meta { font-size: 11px; color: var(--muted); margin-top: 2px; display: flex; gap: 6px; align-items: center; }
-  .gender-tag {
-    font-size: 10px; padding: 1px 6px; border-radius: 10px; font-weight: 700;
-  }
-  .gender-tag.M { background: rgba(91,173,226,0.2); color: var(--male); }
-  .gender-tag.F { background: rgba(241,148,138,0.2); color: var(--female); }
-  .plus-icon { font-size: 22px; color: var(--border); }
-
-  /* ── MODAL ── */
-  .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-    z-index: 500; display: none; align-items: center; justify-content: center;
-    backdrop-filter: blur(4px);
-  }
-  .modal-overlay.show { display: flex; }
-  .modal {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 16px; padding: 28px; width: 380px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-    animation: modalIn 0.2s ease;
-  }
-  @keyframes modalIn { from { transform: scale(0.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-  .modal h3 { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; margin-bottom: 20px; }
-  .form-group { margin-bottom: 14px; }
-  .form-group label { font-size: 12px; color: var(--muted); font-weight: 600; display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .form-group select, .form-group input {
-    width: 100%; background: var(--navy2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 10px 12px; color: var(--text);
-    font-family: 'DM Sans', sans-serif; font-size: 14px;
-    outline: none; transition: border-color 0.2s;
-  }
-  .form-group select:focus, .form-group input:focus { border-color: var(--green); }
-  .form-group select option { background: var(--navy2); }
-  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
-  .modal-actions .btn { flex: 1; justify-content: center; padding: 11px; }
-
-  /* ── PRINT ── */
-  @media print {
-    header, .tabs-bar, .header-actions, .btn, .modal-overlay { display: none !important; }
-    body { background: #fff; color: #000; }
-    .campus-section { display: block !important; padding: 0; }
-    .slot.empty { display: none; }
-    .slot { border: 1px solid #ccc; }
-    .stat-card, .chart-card { border: 1px solid #ccc; background: #fff; }
-    .summary-row, .charts-row { padding: 12px 0; }
-    .campus-section:not(.active) { display: none !important; }
-  }
-
-  /* ── LEGEND ── */
-  .legend-bar {
-    display: flex; gap: 16px; padding: 0 32px 8px;
-    flex-wrap: wrap;
-  }
-  .legend-item-bar { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
-  .legend-swatch { width: 12px; height: 12px; border-radius: 3px; }
-
-  @media (max-width: 768px) {
-    header, .summary-row, .charts-row, .campus-section, .legend-bar { padding-left: 16px; padding-right: 16px; }
-    .tabs-bar { padding: 0 16px; overflow-x: auto; }
-    .charts-row { grid-template-columns: 1fr; }
-    .schedule-grid { grid-template-columns: 60px repeat(6, 1fr); font-size: 11px; }
-    .slot { min-height: 48px; padding: 5px; }
-    .slot-course { font-size: 11px; }
-  }
+:root{
+  --blue:#185FA5;--blue-light:#E6F1FB;--blue-mid:#378ADD;
+  --pink:#993556;--pink-light:#FBEAF0;--pink-mid:#D4537E;
+  --green:#3B6D11;--green-light:#EAF3DE;--green-mid:#639922;
+  --bg:#F8F7F4;--surface:#FFFFFF;--border:#E8E6E0;--border2:#D3D1C7;
+  --text:#1a1a18;--text2:#5F5E5A;--text3:#888780;
+  --dm:#378ADD;--gd:#9F3FBF;--ve:#D85A30;--cs:#E24B4A;--aie:#1D9E75;--wd:#BA7517;
+  --radius:10px;--radius-sm:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:36px;height:36px;background:#1a1a18;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:20px;height:20px;fill:white}
+.logo-text{font-size:15px;font-weight:600;color:var(--text)}
+.logo-sub{font-size:12px;color:var(--text3);font-family:'DM Mono',monospace}
+.header-right{display:flex;align-items:center;gap:10px}
+.btn{padding:8px 16px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;display:flex;align-items:center;gap:6px;transition:all 0.15s}
+.btn:hover{background:var(--bg);border-color:var(--text3)}
+.btn-primary{background:var(--text);color:white;border-color:var(--text)}
+.btn-primary:hover{background:#333;border-color:#333}
+.main{max-width:1100px;margin:0 auto;padding:2rem}
+.campus-tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:4px;width:fit-content;margin-bottom:1.5rem}
+.campus-tab{padding:8px 24px;border-radius:8px;border:none;background:transparent;color:var(--text2);cursor:pointer;font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;transition:all 0.15s}
+.campus-tab.active{background:var(--text);color:white}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px}
+.stat-label{font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px}
+.stat-value{font-size:26px;font-weight:600;color:var(--text);line-height:1}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:4px}
+.stat-m{border-top:3px solid var(--blue-mid)}
+.stat-f{border-top:3px solid var(--pink-mid)}
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.chart-title{font-size:12px;font-family:'DM Mono',monospace;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:16px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;position:relative}
+.bar-label{font-size:12px;color:var(--text2);font-weight:500;width:36px;text-align:right;flex-shrink:0;font-family:'DM Mono',monospace}
+.bar-track{flex:1;height:22px;background:var(--bg);border-radius:4px;overflow:visible;position:relative}
+.bar-fill{height:100%;border-radius:4px;transition:width 0.4s cubic-bezier(.4,0,.2,1);cursor:pointer;position:relative;display:flex;align-items:center}
+.bar-tooltip{display:none;position:absolute;top:-44px;left:50%;transform:translateX(-50%);background:var(--text);color:white;font-size:11px;padding:6px 10px;border-radius:6px;white-space:nowrap;z-index:50;line-height:1.5;pointer-events:none}
+.bar-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--text)}
+.bar-fill:hover .bar-tooltip{display:block}
+.bar-val{font-size:11px;color:var(--text3);width:36px;font-family:'DM Mono',monospace}
+.donut-section{display:flex;align-items:center;justify-content:center;gap:28px;padding:8px 0}
+.donut-wrap{position:relative;width:110px;height:110px;flex-shrink:0}
+.donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.donut-num{font-size:18px;font-weight:600;color:var(--text)}
+.donut-lbl{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace}
+.gender-items{display:flex;flex-direction:column;gap:14px}
+.gender-item{display:flex;align-items:center;gap:10px}
+.g-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.g-info{display:flex;flex-direction:column;gap:1px}
+.g-name{font-size:12px;color:var(--text2)}
+.g-val{font-size:16px;font-weight:600;color:var(--text)}
+.g-pct{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace}
+.section-header{font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.room-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;overflow:hidden}
+.room-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--bg)}
+.room-name{font-size:14px;font-weight:600;color:var(--text)}
+.room-badge{font-size:11px;padding:2px 10px;border-radius:20px;background:var(--surface);color:var(--text3);border:1px solid var(--border);font-family:'DM Mono',monospace}
+.timetable{width:100%;border-collapse:collapse}
+.timetable th{font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);text-transform:uppercase;letter-spacing:0.04em;padding:10px 12px;text-align:center;border-bottom:1px solid var(--border);font-weight:500}
+.timetable th:first-child{text-align:left;width:90px}
+.timetable td{padding:6px;border-bottom:1px solid var(--border);vertical-align:middle}
+.timetable tr:last-child td{border-bottom:none}
+.timetable .day-cell{font-size:12px;font-weight:500;color:var(--text2);padding:6px 12px;font-family:'DM Mono',monospace}
+.slot-cell{cursor:pointer}
+.slot-inner{border-radius:8px;padding:10px 12px;min-height:62px;display:flex;flex-direction:column;justify-content:space-between;transition:opacity 0.15s;border:1px solid transparent}
+.slot-inner:hover{opacity:0.85}
+.slot-inner.empty{background:var(--bg);border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center}
+.slot-empty-txt{font-size:11px;color:var(--text3)}
+.slot-course-name{font-size:12px;font-weight:600}
+.slot-gender-badge{font-size:10px;padding:2px 7px;border-radius:12px;display:inline-block;margin-top:4px;font-weight:500}
+.slot-cap-txt{font-size:10px;margin-top:6px;opacity:0.7;font-family:'DM Mono',monospace}
+.legend-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:1.25rem}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2)}
+.legend-dot{width:8px;height:8px;border-radius:50%}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:24px;width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.12)}
+.modal-title{font-size:15px;font-weight:600;margin-bottom:18px;color:var(--text)}
+.modal-sub{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:18px;margin-top:-12px}
+.field{margin-bottom:14px}
+.field label{font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em}
+.field select,.field input{width:100%;padding:8px 10px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif}
+.field select:focus,.field input:focus{outline:none;border-color:var(--blue-mid)}
+.modal-actions{display:flex;gap:8px;margin-top:18px}
+.modal-actions button{flex:1;padding:9px;border-radius:var(--radius-sm);border:1px solid var(--border2);cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500}
+.btn-save-m{background:var(--text);color:white;border-color:var(--text)}
+.btn-clear-m{background:white;color:#E24B4A;border-color:#F09595}
+.btn-cancel-m{background:white;color:var(--text2);border-color:var(--border2)}
+.divider{height:1px;background:var(--border);margin:1.5rem 0}
+@media print{
+  header .header-right,.campus-tabs,.legend-row,.modal-bg{display:none!important}
+  header{position:relative;border-bottom:2px solid #1a1a18}
+  body{background:white}
+  .main{padding:1rem}
+  .stats-row,.charts-row{page-break-inside:avoid}
+  .room-block{page-break-inside:avoid;border:1px solid #ccc}
+  .slot-inner.empty{display:none!important}
+  .slot-cell{cursor:default}
+  .btn{display:none}
+}
 </style>
 </head>
 <body>
 
-<!-- TOOLTIP -->
-<div class="tooltip" id="tooltip">
-  <div class="tooltip-title" id="tt-title"></div>
-  <div class="tooltip-row"><span class="tooltip-key">Male</span><span class="tooltip-val" id="tt-male"></span></div>
-  <div class="tooltip-row"><span class="tooltip-key">Female</span><span class="tooltip-val" id="tt-female"></span></div>
-  <div class="tooltip-row"><span class="tooltip-key">Total</span><span class="tooltip-val" id="tt-total"></span></div>
-</div>
-
-<!-- HEADER -->
 <header>
-  <div class="logo-block">
-    <div class="logo-mark">BQ</div>
-    <div class="logo-text">
-      <h1>Bano Qabil</h1>
-      <p>Batch 2 — Timetable Manager</p>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+    </div>
+    <div>
+      <div class="logo-text">Bano Qabil — Batch 2</div>
+      <div class="logo-sub">Timetable Management</div>
     </div>
   </div>
-  <div class="header-actions">
-    <button class="btn btn-outline" onclick="exportJSON()">⬇ Export JSON</button>
-    <button class="btn btn-outline" onclick="importJSON()">⬆ Import JSON</button>
-    <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
-    <button class="btn btn-primary" onclick="window.print()">🖨 Print</button>
+  <div class="header-right">
+    <button class="btn" onclick="window.print()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Print page
+    </button>
+    <button class="btn btn-primary" onclick="exportData()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export JSON
+    </button>
   </div>
 </header>
 
-<!-- TABS -->
-<div class="tabs-bar">
-  <div class="tab active" onclick="switchCampus('darussalam', this)">🏫 Darussalam Campus</div>
-  <div class="tab" onclick="switchCampus('islamic', this)">🕌 Islamic Center</div>
+<div class="main">
+  <div class="campus-tabs">
+    <button class="campus-tab active" onclick="switchCampus('ds')">Darussalam Campus</button>
+    <button class="campus-tab" onclick="switchCampus('ic')">Islamic Center</button>
+  </div>
+
+  <div class="stats-row" id="stats-row"></div>
+  <div class="charts-row" id="charts-row"></div>
+  <div class="divider"></div>
+
+  <div class="legend-row">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--blue-mid)"></div>Male</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--pink-mid)"></div>Female</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green-mid)"></div>Mixed</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--border2)"></div>Empty — click to assign</div>
+  </div>
+
+  <div id="campus-view"></div>
 </div>
 
-<!-- SUMMARY CARDS -->
-<div class="summary-row">
-  <div class="stat-card s-total">
-    <div class="stat-label">Total Capacity</div>
-    <div class="stat-value" id="stat-total">0</div>
-    <div class="stat-sub" id="stat-total-sub">across all batches</div>
-  </div>
-  <div class="stat-card s-male">
-    <div class="stat-label">Male Students</div>
-    <div class="stat-value" id="stat-male">0</div>
-    <div class="stat-sub" id="stat-male-pct"></div>
-  </div>
-  <div class="stat-card s-female">
-    <div class="stat-label">Female Students</div>
-    <div class="stat-value" id="stat-female">0</div>
-    <div class="stat-sub" id="stat-female-pct"></div>
-  </div>
-  <div class="stat-card s-courses">
-    <div class="stat-label">Active Batches</div>
-    <div class="stat-value" id="stat-batches">0</div>
-    <div class="stat-sub" id="stat-courses-sub">in current campus</div>
-  </div>
-</div>
-
-<!-- CHARTS -->
-<div class="charts-row">
-  <div class="chart-card">
-    <div class="chart-title">Students per Course</div>
-    <div class="bar-chart" id="barChart"></div>
-  </div>
-  <div class="chart-card">
-    <div class="chart-title">Gender Distribution</div>
-    <div class="donut-wrap">
-      <svg id="donut-svg" viewBox="0 0 140 140">
-        <circle cx="70" cy="70" r="54" fill="none" stroke="#1B2A3B" stroke-width="22"/>
-        <circle id="donut-male" cx="70" cy="70" r="54" fill="none" stroke="#5DADE2" stroke-width="22"
-          stroke-dasharray="0 339.3" stroke-dashoffset="84.8" transform="rotate(-90 70 70)" style="transition:stroke-dasharray 0.5s"/>
-        <circle id="donut-female" cx="70" cy="70" r="54" fill="none" stroke="#F1948A" stroke-width="22"
-          stroke-dasharray="0 339.3" stroke-dashoffset="84.8" transform="rotate(-90 70 70)" style="transition:all 0.5s"/>
-        <text x="70" y="66" text-anchor="middle" fill="#E8F4F8" font-family="Syne" font-size="14" font-weight="800" id="donut-center-pct">50%</text>
-        <text x="70" y="82" text-anchor="middle" fill="#7FA8C0" font-family="DM Sans" font-size="10" id="donut-center-lbl">Male</text>
-      </svg>
-      <div class="donut-legend">
-        <div class="legend-item"><div class="legend-dot" style="background:var(--male)"></div><span id="leg-male">Male: 0</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--female)"></div><span id="leg-female">Female: 0</span></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- LEGEND -->
-<div class="legend-bar" style="margin-top:16px">
-  <div class="legend-item-bar"><div class="legend-swatch" style="background:var(--male);opacity:0.6"></div>Male slot</div>
-  <div class="legend-item-bar"><div class="legend-swatch" style="background:var(--female);opacity:0.6"></div>Female slot</div>
-  <div class="legend-item-bar"><div class="legend-swatch" style="background:var(--card2);border:1px dashed var(--border)"></div>Empty slot (click to assign)</div>
-</div>
-
-<!-- DARUSSALAM -->
-<div class="campus-section active" id="campus-darussalam"></div>
-<!-- ISLAMIC CENTER -->
-<div class="campus-section" id="campus-islamic"></div>
-
-<!-- MODAL -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
-  <div class="modal" onclick="event.stopPropagation()">
-    <h3 id="modalTitle">Edit Slot</h3>
-    <div class="form-group">
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Edit slot</div>
+    <div class="modal-sub" id="modal-sub"></div>
+    <div class="field">
       <label>Course</label>
-      <select id="modalCourse">
-        <option value="">— Empty —</option>
-        <option value="DM">Digital Marketing (DM)</option>
-        <option value="GD">Graphic Design (GD)</option>
-        <option value="VE">Video Editing (VE)</option>
-        <option value="CS">Cybersecurity (CS)</option>
-        <option value="AiE">AI Essentials (AiE)</option>
-        <option value="WD">Website Development (WD)</option>
+      <select id="m-course">
+        <option value="">— empty —</option>
+        <option value="DM">Digital Marketing</option>
+        <option value="GD">Graphic Design</option>
+        <option value="VE">Video Editing</option>
+        <option value="CS">Cybersecurity</option>
+        <option value="AiE">AI Essentials</option>
+        <option value="WD">Website Development</option>
       </select>
     </div>
-    <div class="form-group">
+    <div class="field">
       <label>Gender</label>
-      <select id="modalGender">
+      <select id="m-gender">
         <option value="M">Male</option>
         <option value="F">Female</option>
+        <option value="M+F">Mixed (M+F)</option>
       </select>
     </div>
-    <div class="form-group">
-      <label>Capacity (students)</label>
-      <input type="number" id="modalCap" min="1" max="100" value="40">
+    <div class="field">
+      <label>Capacity (seats)</label>
+      <input type="number" id="m-cap" min="1" max="200">
     </div>
     <div class="modal-actions">
-      <button class="btn btn-danger" onclick="clearSlot()">Clear Slot</button>
-      <button class="btn btn-outline" onclick="closeModalDirect()">Cancel</button>
-      <button class="btn btn-primary" onclick="saveSlot()">Save</button>
+      <button class="btn-clear-m" onclick="clearSlot()">Clear</button>
+      <button class="btn-cancel-m" onclick="closeModal()">Cancel</button>
+      <button class="btn-save-m" onclick="saveSlot()">Save</button>
     </div>
   </div>
 </div>
 
 <script>
-// ─── DATA ───────────────────────────────────────────────────────────────────
+const SLOTS=['9–11 am','11:30 am–1:30 pm','2–4 pm','4:30–6:30 pm'];
+const DAYS=['Mon – Tue','Wed – Thu','Sat – Sun'];
+const COURSE_NAMES={DM:'Digital Marketing',GD:'Graphic Design',VE:'Video Editing',CS:'Cybersecurity',AiE:'AI Essentials',WD:'Website Dev'};
+const COURSE_COLORS={DM:'#378ADD',GD:'#9F3FBF',VE:'#D85A30',CS:'#E24B4A',AiE:'#1D9E75',WD:'#BA7517'};
+const COURSE_BG={DM:'#E6F1FB',GD:'#F3E8FA',VE:'#FAECE7',CS:'#FCEBEB',AiE:'#E1F5EE',WD:'#FAEEDA'};
 
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Sat', 'Sun'];
-const TIME_SLOTS = [
-  { label: '9–11am',      gender: 'M' },
-  { label: '11:30–1:30',  gender: 'F' },
-  { label: '2–4pm',       gender: 'F' },
-  { label: '4:30–6:30',   gender: 'M' },
-];
-
-const COURSES = {
-  DM:  { name: 'Digital Marketing',  color: '#F39C12', type: 'C' },
-  GD:  { name: 'Graphic Design',     color: '#9B59B6', type: 'L' },
-  VE:  { name: 'Video Editing',      color: '#E74C3C', type: 'L' },
-  CS:  { name: 'Cybersecurity',      color: '#1ABC9C', type: 'L' },
-  AiE: { name: 'AI Essentials',      color: '#2ECC71', type: 'C' },
-  WD:  { name: 'Website Dev',        color: '#5DADE2', type: 'L' },
+const campuses={
+  ds:{name:'Darussalam Campus',rooms:[
+    {id:'ds-lab1',label:'Computer Lab 1',type:'lab',cap:50,slots:{}},
+    {id:'ds-lab2',label:'Computer Lab 2',type:'lab',cap:40,slots:{}},
+    {id:'ds-cls',label:'Classroom',type:'class',cap:50,slots:{}}
+  ]},
+  ic:{name:'Islamic Center',rooms:[
+    {id:'ic-lab',label:'Computer Lab',type:'lab',cap:35,slots:{}},
+    {id:'ic-cls',label:'Classroom',type:'class',cap:45,slots:{}}
+  ]}
 };
 
-// Each room has a 4×6 grid (4 time slots × 6 days)
-// slot value: null | { course, gender, cap }
-
-function makeGrid() {
-  return Array.from({length: 4}, () => Array(6).fill(null));
-}
-
-// Default schedule based on conversation
-const CAMPUSES = {
-  darussalam: {
-    name: 'Darussalam Campus',
-    rooms: [
-      {
-        id: 'ds-lab1', name: 'Lab 1', type: 'lab', cap: 50,
-        grid: (() => {
-          const g = makeGrid();
-          // M slots (rows 0,3) — time 9-11am and 4:30-6:30pm
-          // F slots (rows 1,2) — 11:30-1:30 and 2-4pm
-          // Assign: GD, VE, CS, WD to lab 1 (M batches)
-          // Row 0 (Mon/Tue = GDM, Wed/Thu = VEM, Sat/Sun = CSM)
-          g[0][0]={course:'GD',gender:'M',cap:50}; g[0][1]={course:'GD',gender:'M',cap:50};
-          g[0][2]={course:'VE',gender:'M',cap:50}; g[0][3]={course:'VE',gender:'M',cap:50};
-          g[0][4]={course:'CS',gender:'M',cap:50}; g[0][5]={course:'CS',gender:'M',cap:50};
-          // Row 1 (F 11:30-1:30)
-          g[1][0]={course:'GD',gender:'F',cap:50}; g[1][1]={course:'GD',gender:'F',cap:50};
-          g[1][2]={course:'VE',gender:'F',cap:50}; g[1][3]={course:'VE',gender:'F',cap:50};
-          g[1][4]={course:'CS',gender:'F',cap:50}; g[1][5]={course:'CS',gender:'F',cap:50};
-          // Row 2 (F 2-4pm)
-          g[2][0]={course:'WD',gender:'F',cap:50}; g[2][1]={course:'WD',gender:'F',cap:50};
-          // Row 3 (M 4:30-6:30)
-          g[3][0]={course:'WD',gender:'M',cap:50}; g[3][1]={course:'WD',gender:'M',cap:50};
-          g[3][4]={course:'CS',gender:'M',cap:50}; g[3][5]={course:'CS',gender:'M',cap:50};
-          return g;
-        })()
-      },
-      {
-        id: 'ds-lab2', name: 'Lab 2', type: 'lab', cap: 40,
-        grid: (() => {
-          const g = makeGrid();
-          g[0][0]={course:'CS',gender:'M',cap:40}; g[0][1]={course:'CS',gender:'M',cap:40};
-          g[1][0]={course:'CS',gender:'F',cap:40}; g[1][1]={course:'CS',gender:'F',cap:40};
-          return g;
-        })()
-      },
-      {
-        id: 'ds-class', name: 'Classroom', type: 'classroom', cap: 50,
-        grid: (() => {
-          const g = makeGrid();
-          g[0][0]={course:'DM',gender:'M',cap:50}; g[0][1]={course:'DM',gender:'M',cap:50};
-          g[0][2]={course:'DM',gender:'M',cap:50}; g[0][3]={course:'DM',gender:'M',cap:50};
-          g[1][0]={course:'DM',gender:'F',cap:50}; g[1][1]={course:'DM',gender:'F',cap:50};
-          g[1][2]={course:'DM',gender:'F',cap:50}; g[1][3]={course:'DM',gender:'F',cap:50};
-          g[2][0]={course:'AiE',gender:'F',cap:50}; g[2][1]={course:'AiE',gender:'F',cap:50};
-          g[2][2]={course:'AiE',gender:'F',cap:50}; g[2][3]={course:'AiE',gender:'F',cap:50};
-          g[3][0]={course:'AiE',gender:'M',cap:50}; g[3][1]={course:'AiE',gender:'M',cap:50};
-          g[3][2]={course:'AiE',gender:'M',cap:50}; g[3][3]={course:'AiE',gender:'M',cap:50};
-          return g;
-        })()
-      }
-    ]
+const defaults={
+  'ds-lab1':{
+    '0-0':{course:'GD',gender:'M',cap:50},'0-1':{course:'GD',gender:'F',cap:50},
+    '0-2':{course:'VE',gender:'F',cap:50},'0-3':{course:'VE',gender:'M',cap:50},
+    '1-0':{course:'CS',gender:'M',cap:50},'1-1':{course:'CS',gender:'F',cap:50},
+    '1-2':{course:'WD',gender:'F',cap:50},'1-3':{course:'WD',gender:'M',cap:50},
+    '2-0':{course:'CS',gender:'M',cap:50},'2-1':{course:'CS',gender:'F',cap:50},
+    '2-2':{course:'GD',gender:'F',cap:50},'2-3':{course:'GD',gender:'M',cap:50}
   },
-  islamic: {
-    name: 'Islamic Center',
-    rooms: [
-      {
-        id: 'ic-lab', name: 'Lab', type: 'lab', cap: 35,
-        grid: (() => {
-          const g = makeGrid();
-          g[0][0]={course:'GD',gender:'M',cap:35}; g[0][1]={course:'GD',gender:'M',cap:35};
-          g[0][2]={course:'VE',gender:'M',cap:35}; g[0][3]={course:'VE',gender:'M',cap:35};
-          g[0][4]={course:'CS',gender:'M',cap:35}; g[0][5]={course:'CS',gender:'M',cap:35};
-          g[1][0]={course:'GD',gender:'F',cap:35}; g[1][1]={course:'GD',gender:'F',cap:35};
-          g[1][2]={course:'VE',gender:'F',cap:35}; g[1][3]={course:'VE',gender:'F',cap:35};
-          g[1][4]={course:'CS',gender:'F',cap:35}; g[1][5]={course:'CS',gender:'F',cap:35};
-          g[2][0]={course:'WD',gender:'F',cap:35}; g[2][1]={course:'WD',gender:'F',cap:35};
-          g[3][0]={course:'WD',gender:'M',cap:35}; g[3][1]={course:'WD',gender:'M',cap:35};
-          return g;
-        })()
-      },
-      {
-        id: 'ic-class', name: 'Classroom', type: 'classroom', cap: 45,
-        grid: (() => {
-          const g = makeGrid();
-          g[0][0]={course:'DM',gender:'M',cap:45}; g[0][1]={course:'DM',gender:'M',cap:45};
-          g[0][2]={course:'DM',gender:'M',cap:45}; g[0][3]={course:'DM',gender:'M',cap:45};
-          g[1][0]={course:'DM',gender:'F',cap:45}; g[1][1]={course:'DM',gender:'F',cap:45};
-          g[1][2]={course:'DM',gender:'F',cap:45}; g[1][3]={course:'DM',gender:'F',cap:45};
-          g[2][0]={course:'AiE',gender:'F',cap:45}; g[2][1]={course:'AiE',gender:'F',cap:45};
-          g[2][2]={course:'AiE',gender:'F',cap:45}; g[2][3]={course:'AiE',gender:'F',cap:45};
-          g[3][0]={course:'AiE',gender:'M',cap:45}; g[3][1]={course:'AiE',gender:'M',cap:45};
-          g[3][2]={course:'AiE',gender:'M',cap:45}; g[3][3]={course:'AiE',gender:'M',cap:45};
-          return g;
-        })()
-      }
-    ]
+  'ds-lab2':{
+    '0-0':{course:'VE',gender:'M',cap:40},'0-1':{course:'VE',gender:'F',cap:40},
+    '1-0':{course:'CS',gender:'M',cap:40},'1-1':{course:'CS',gender:'F',cap:40},
+    '2-0':{course:'WD',gender:'M',cap:40},'2-1':{course:'WD',gender:'F',cap:40}
+  },
+  'ds-cls':{
+    '0-0':{course:'DM',gender:'M',cap:50},'0-1':{course:'DM',gender:'F',cap:50},
+    '0-2':{course:'AiE',gender:'F',cap:50},'0-3':{course:'AiE',gender:'M',cap:50},
+    '1-0':{course:'DM',gender:'M',cap:50},'1-1':{course:'DM',gender:'F',cap:50},
+    '1-2':{course:'AiE',gender:'F',cap:50},'1-3':{course:'AiE',gender:'M',cap:50},
+    '2-0':{course:'DM',gender:'M',cap:50},'2-1':{course:'DM',gender:'F',cap:50},
+    '2-2':{course:'AiE',gender:'F',cap:50},'2-3':{course:'AiE',gender:'M',cap:50}
+  },
+  'ic-lab':{
+    '0-0':{course:'GD',gender:'M',cap:35},'0-1':{course:'GD',gender:'F',cap:35},
+    '0-2':{course:'VE',gender:'F',cap:35},'0-3':{course:'VE',gender:'M',cap:35},
+    '1-0':{course:'CS',gender:'M',cap:35},'1-1':{course:'CS',gender:'F',cap:35},
+    '2-0':{course:'WD',gender:'M',cap:35},'2-1':{course:'WD',gender:'F',cap:35}
+  },
+  'ic-cls':{
+    '0-0':{course:'DM',gender:'M',cap:45},'0-1':{course:'DM',gender:'F',cap:45},
+    '0-2':{course:'AiE',gender:'F',cap:45},'0-3':{course:'AiE',gender:'M',cap:45},
+    '1-0':{course:'DM',gender:'M',cap:45},'1-1':{course:'DM',gender:'F',cap:45},
+    '1-2':{course:'AiE',gender:'F',cap:45},'1-3':{course:'AiE',gender:'M',cap:45},
+    '2-0':{course:'DM',gender:'M',cap:45},'2-1':{course:'DM',gender:'F',cap:45},
+    '2-2':{course:'AiE',gender:'F',cap:45},'2-3':{course:'AiE',gender:'M',cap:45}
   }
 };
 
-// ─── STATE ──────────────────────────────────────────────────────────────────
-let currentCampus = 'darussalam';
-let editTarget = null; // { campusKey, roomIdx, row, col }
+Object.keys(defaults).forEach(rid=>{
+  const campus=rid.startsWith('ds')?campuses.ds:campuses.ic;
+  const room=campus.rooms.find(r=>r.id===rid);
+  if(room)room.slots=JSON.parse(JSON.stringify(defaults[rid]));
+});
 
-// ─── RENDER ─────────────────────────────────────────────────────────────────
-function renderAll() {
-  renderCampus('darussalam');
-  renderCampus('islamic');
-  updateStats();
+let currentCampus='ds';
+let editingSlot=null;
+
+function switchCampus(c){
+  currentCampus=c;
+  document.querySelectorAll('.campus-tab').forEach((t,i)=>t.classList.toggle('active',i===(c==='ds'?0:1)));
+  render();
 }
 
-function renderCampus(campusKey) {
-  const campus = CAMPUSES[campusKey];
-  const container = document.getElementById(`campus-${campusKey}`);
-  container.innerHTML = '';
-
-  campus.rooms.forEach((room, roomIdx) => {
-    const block = document.createElement('div');
-    block.className = 'room-block';
-
-    block.innerHTML = `
-      <div class="room-header">
-        <div class="room-title">${room.name}</div>
-        <div class="room-badge ${room.type}">${room.type === 'lab' ? '💻 Lab' : '📚 Classroom'}</div>
-        <div class="room-cap">Max ${room.cap} seats/batch</div>
-      </div>
-      <div class="schedule-grid" id="grid-${room.id}"></div>
-    `;
-    container.appendChild(block);
-
-    const grid = block.querySelector(`#grid-${room.id}`);
-
-    // Header row
-    grid.appendChild(makeEl('div', 'grid-header', ''));
-    DAYS.forEach(d => grid.appendChild(makeEl('div', 'grid-header', d)));
-
-    // Time slot rows
-    room.grid.forEach((rowData, row) => {
-      const ts = TIME_SLOTS[row];
-      const timeEl = document.createElement('div');
-      timeEl.className = 'time-label';
-      timeEl.innerHTML = `<span>${ts.label}<br><small style="color:var(--${ts.gender==='M'?'male':'female'})">${ts.gender==='M'?'♂ Male':'♀ Female'}</small></span>`;
-      grid.appendChild(timeEl);
-
-      rowData.forEach((cell, col) => {
-        const slotEl = document.createElement('div');
-        if (cell) {
-          const c = COURSES[cell.course];
-          slotEl.className = `slot ${cell.gender === 'M' ? 'male' : 'female'}`;
-          slotEl.innerHTML = `
-            <div class="slot-course" style="color:${c.color}">${cell.course}</div>
-            <div class="slot-meta">
-              <span class="gender-tag ${cell.gender}">${cell.gender}</span>
-              <span>${cell.cap} seats</span>
-            </div>
-          `;
-          slotEl.title = `${c.name} — ${cell.gender === 'M' ? 'Male' : 'Female'} — ${cell.cap} seats`;
-        } else {
-          slotEl.className = 'slot empty';
-          slotEl.innerHTML = `<div class="plus-icon">+</div>`;
-        }
-        slotEl.addEventListener('click', () => openModal(campusKey, roomIdx, row, col));
-        grid.appendChild(slotEl);
-      });
-    });
-  });
-}
-
-function makeEl(tag, cls, html) {
-  const el = document.createElement(tag);
-  el.className = cls;
-  el.innerHTML = html;
-  return el;
-}
-
-// ─── STATS + CHARTS ─────────────────────────────────────────────────────────
-function updateStats() {
-  const campus = CAMPUSES[currentCampus];
-  let total = 0, male = 0, female = 0, batches = 0;
-  const courseMap = {}; // { course: { M: cap, F: cap } }
-
-  // Count UNIQUE batches: a batch = consecutive same-course/gender slots on same days (simplified: count distinct pairs per room)
-  // For stats, count each non-null slot's capacity (as per the grid — a course batch typically occupies 2 day-slots)
-  // We'll count unique batch groups: same course+gender in a row = 1 batch group across days pair
-  // Simpler: just count capacities per unique batch (every 2 adjacent same slots = 1 batch)
-  // Actually per user's design: each course occupies 2 day-slots/week. So count slots / 2.
-  // For simplicity and editability, count each filled slot's cap contribution but divide by 2 for batch count
-  // Better: count distinct (room, row, batchGroup) where batchGroup = consecutive same course+gender pair
-
-  campus.rooms.forEach(room => {
-    room.grid.forEach((rowData, row) => {
-      // Find batch groups in this row
-      let i = 0;
-      while (i < rowData.length) {
-        const cell = rowData[i];
-        if (!cell) { i++; continue; }
-        // Count how many consecutive slots have same course+gender
-        let j = i;
-        while (j < rowData.length && rowData[j] && rowData[j].course === cell.course && rowData[j].gender === cell.gender) j++;
-        // This is one batch (regardless of how many slots it spans)
-        const batchCap = cell.cap;
-        batches++;
-        total += batchCap;
-        if (cell.gender === 'M') male += batchCap;
-        else female += batchCap;
-        if (!courseMap[cell.course]) courseMap[cell.course] = { M: 0, F: 0 };
-        courseMap[cell.course][cell.gender] += batchCap;
-        i = j;
+function calcStats(c){
+  let total=0,male=0,female=0,filled=0,totalSlots=0;
+  const courseTotal={},courseM={},courseF={};
+  c.rooms.forEach(room=>{
+    for(let d=0;d<3;d++)for(let s=0;s<4;s++){
+      totalSlots++;
+      const sl=room.slots[d+'-'+s];
+      if(sl){
+        filled++;total+=sl.cap;
+        if(sl.gender==='M')male+=sl.cap;
+        else if(sl.gender==='F')female+=sl.cap;
+        else{male+=Math.round(sl.cap/2);female+=Math.round(sl.cap/2);}
+        courseTotal[sl.course]=(courseTotal[sl.course]||0)+sl.cap;
+        const cm=sl.gender==='M'?sl.cap:sl.gender==='M+F'?Math.round(sl.cap/2):0;
+        const cf=sl.gender==='F'?sl.cap:sl.gender==='M+F'?Math.round(sl.cap/2):0;
+        courseM[sl.course]=(courseM[sl.course]||0)+cm;
+        courseF[sl.course]=(courseF[sl.course]||0)+cf;
       }
-    });
+    }
   });
-
-  document.getElementById('stat-total').textContent = total.toLocaleString();
-  document.getElementById('stat-male').textContent = male.toLocaleString();
-  document.getElementById('stat-female').textContent = female.toLocaleString();
-  document.getElementById('stat-batches').textContent = batches;
-  document.getElementById('stat-male-pct').textContent = total ? `${Math.round(male/total*100)}% of total` : '';
-  document.getElementById('stat-female-pct').textContent = total ? `${Math.round(female/total*100)}% of total` : '';
-
-  renderBarChart(courseMap, total);
-  renderDonut(male, female);
+  return{total,male,female,filled,totalSlots,courseTotal,courseM,courseF};
 }
 
-function renderBarChart(courseMap, maxTotal) {
-  const container = document.getElementById('barChart');
-  container.innerHTML = '';
-  const maxVal = Math.max(...Object.values(courseMap).map(v => v.M + v.F), 1);
+function render(){
+  const c=campuses[currentCampus];
+  const s=calcStats(c);
+  renderStats(s);
+  renderCharts(s);
+  renderRooms(c);
+}
 
-  Object.entries(courseMap).sort((a,b) => (b[1].M+b[1].F) - (a[1].M+a[1].F)).forEach(([code, val]) => {
-    const total = val.M + val.F;
-    const mPct = (val.M / maxVal * 100).toFixed(1);
-    const fPct = (val.F / maxVal * 100).toFixed(1);
-    const c = COURSES[code];
-    const row = document.createElement('div');
-    row.className = 'bar-row';
-    row.innerHTML = `
-      <div class="bar-label">${c.name}</div>
-      <div class="bar-track" data-code="${code}" data-m="${val.M}" data-f="${val.F}" data-total="${total}">
-        <div style="display:flex;height:100%;border-radius:4px;overflow:hidden">
-          <div class="bar-fill-m" style="width:${mPct}%"></div>
-          <div class="bar-fill-f" style="width:${fPct}%"></div>
+function renderStats(s){
+  const mPct=s.total?Math.round(s.male/s.total*100):0;
+  const fPct=s.total?Math.round(s.female/s.total*100):0;
+  document.getElementById('stats-row').innerHTML=`
+    <div class="stat-card">
+      <div class="stat-label">Total capacity</div>
+      <div class="stat-value">${s.total.toLocaleString()}</div>
+      <div class="stat-sub">${s.filled} of ${s.totalSlots} slots filled</div>
+    </div>
+    <div class="stat-card stat-m">
+      <div class="stat-label">Male students</div>
+      <div class="stat-value" style="color:var(--blue)">${s.male.toLocaleString()}</div>
+      <div class="stat-sub">${mPct}% of total</div>
+    </div>
+    <div class="stat-card stat-f">
+      <div class="stat-label">Female students</div>
+      <div class="stat-value" style="color:var(--pink)">${s.female.toLocaleString()}</div>
+      <div class="stat-sub">${fPct}% of total</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Courses running</div>
+      <div class="stat-value">${Object.keys(s.courseTotal).length}</div>
+      <div class="stat-sub">out of 6 offered</div>
+    </div>`;
+}
+
+function renderCharts(s){
+  const entries=Object.entries(s.courseTotal).sort((a,b)=>b[1]-a[1]);
+  const maxVal=Math.max(...entries.map(e=>e[1]),1);
+  const bars=entries.map(([code,total])=>{
+    const m=s.courseM[code]||0,f=s.courseF[code]||0;
+    const pct=Math.round(total/maxVal*100);
+    const col=COURSE_COLORS[code];
+    return`<div class="bar-row">
+      <div class="bar-label">${code}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${pct}%;background:${col}">
+          <div class="bar-tooltip">${COURSE_NAMES[code]}<br>Total: ${total} &nbsp;·&nbsp; M: ${m} &nbsp;·&nbsp; F: ${f}</div>
         </div>
       </div>
       <div class="bar-val">${total}</div>
-    `;
-    row.querySelector('.bar-track').addEventListener('mousemove', showTooltip);
-    row.querySelector('.bar-track').addEventListener('mouseleave', hideTooltip);
-    container.appendChild(row);
+    </div>`;
+  }).join('');
+
+  const total=s.male+s.female||1;
+  const mP=Math.round(s.male/total*100),fP=100-mP;
+  const r=42,cx=55,cy=55,circ=2*Math.PI*r;
+  const mD=circ*mP/100,fD=circ*fP/100;
+
+  document.getElementById('charts-row').innerHTML=`
+    <div class="chart-card">
+      <div class="chart-title">Students per course — hover for breakdown</div>
+      ${bars||'<div style="font-size:12px;color:var(--text3)">No slots assigned yet</div>'}
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Gender distribution</div>
+      <div class="donut-section">
+        <div class="donut-wrap">
+          <svg viewBox="0 0 110 110" width="110" height="110">
+            <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#F1EFE8" stroke-width="16"/>
+            <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#378ADD" stroke-width="16"
+              stroke-dasharray="${mD} ${circ-mD}" transform="rotate(-90 ${cx} ${cy})"/>
+            <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#D4537E" stroke-width="16"
+              stroke-dasharray="${fD} ${circ-fD}" stroke-dashoffset="${-mD}" transform="rotate(-90 ${cx} ${cy})"/>
+          </svg>
+          <div class="donut-center">
+            <div class="donut-num">${s.total.toLocaleString()}</div>
+            <div class="donut-lbl">total</div>
+          </div>
+        </div>
+        <div class="gender-items">
+          <div class="gender-item">
+            <div class="g-dot" style="background:#378ADD"></div>
+            <div class="g-info">
+              <div class="g-name">Male</div>
+              <div class="g-val">${s.male.toLocaleString()}</div>
+              <div class="g-pct">${mP}%</div>
+            </div>
+          </div>
+          <div class="gender-item">
+            <div class="g-dot" style="background:#D4537E"></div>
+            <div class="g-info">
+              <div class="g-name">Female</div>
+              <div class="g-val">${s.female.toLocaleString()}</div>
+              <div class="g-pct">${fP}%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderRooms(c){
+  const view=document.getElementById('campus-view');
+  view.innerHTML=`<div class="section-header">${c.name} — Schedule</div>`;
+  c.rooms.forEach(room=>{
+    const block=document.createElement('div');
+    block.className='room-block';
+    let html=`<div class="room-header">
+      <div class="room-name">${room.label}</div>
+      <div class="room-badge">${room.type==='lab'?'Computer Lab':'Classroom'}</div>
+      <div class="room-badge">${room.cap} seats max</div>
+    </div>
+    <table class="timetable">
+      <thead><tr>
+        <th></th>
+        ${SLOTS.map(s=>`<th>${s}</th>`).join('')}
+      </tr></thead>
+      <tbody>`;
+    DAYS.forEach((day,d)=>{
+      html+=`<tr><td class="day-cell">${day}</td>`;
+      for(let s=0;s<4;s++){
+        const key=d+'-'+s;
+        const sl=room.slots[key];
+        if(sl){
+          const col=COURSE_COLORS[sl.course];
+          const bg=COURSE_BG[sl.course];
+          const gBg=sl.gender==='M'?'#E6F1FB':sl.gender==='F'?'#FBEAF0':'#EAF3DE';
+          const gCol=sl.gender==='M'?'#0C447C':sl.gender==='F'?'#72243E':'#27500A';
+          html+=`<td class="slot-cell" onclick="openModal('${room.id}',${d},${s},true)">
+            <div class="slot-inner" style="background:${bg};border-color:${col}22">
+              <div>
+                <div class="slot-course-name" style="color:${col}">${sl.course}</div>
+                <span class="slot-gender-badge" style="background:${gBg};color:${gCol}">${sl.gender}</span>
+              </div>
+              <div class="slot-cap-txt">${sl.cap} seats</div>
+            </div>
+          </td>`;
+        } else {
+          html+=`<td class="slot-cell" onclick="openModal('${room.id}',${d},${s},false)">
+            <div class="slot-inner empty"><span class="slot-empty-txt">+ assign</span></div>
+          </td>`;
+        }
+      }
+      html+=`</tr>`;
+    });
+    html+=`</tbody></table>`;
+    block.innerHTML=html;
+    view.appendChild(block);
   });
 }
 
-function renderDonut(male, female) {
-  const total = male + female;
-  const circ = 2 * Math.PI * 54; // ~339.3
-  const mArc = total ? (male / total) * circ : 0;
-  const fArc = total ? (female / total) * circ : 0;
-  const mPct = total ? Math.round(male/total*100) : 0;
-
-  const dm = document.getElementById('donut-male');
-  const df = document.getElementById('donut-female');
-  dm.setAttribute('stroke-dasharray', `${mArc} ${circ}`);
-  df.setAttribute('stroke-dasharray', `${fArc} ${circ}`);
-  df.setAttribute('stroke-dashoffset', -(mArc - circ/4) + circ/4);
-
-  // Simpler approach
-  dm.setAttribute('stroke-dasharray', `${mArc} ${circ - mArc}`);
-  dm.setAttribute('stroke-dashoffset', circ / 4);
-  df.setAttribute('stroke-dasharray', `${fArc} ${circ - fArc}`);
-  df.setAttribute('stroke-dashoffset', circ / 4 - mArc);
-
-  document.getElementById('donut-center-pct').textContent = `${mPct}%`;
-  document.getElementById('donut-center-lbl').textContent = 'Male';
-  document.getElementById('leg-male').textContent = `Male: ${male.toLocaleString()}`;
-  document.getElementById('leg-female').textContent = `Female: ${female.toLocaleString()}`;
+function findRoom(rid){
+  for(const c of Object.values(campuses))for(const r of c.rooms)if(r.id===rid)return r;
 }
 
-// ─── TOOLTIP ────────────────────────────────────────────────────────────────
-const tt = document.getElementById('tooltip');
-function showTooltip(e) {
-  const el = e.currentTarget;
-  const code = el.dataset.code;
-  document.getElementById('tt-title').textContent = COURSES[code].name;
-  document.getElementById('tt-male').textContent = `${el.dataset.m} seats`;
-  document.getElementById('tt-female').textContent = `${el.dataset.f} seats`;
-  document.getElementById('tt-total').textContent = `${el.dataset.total} seats`;
-  tt.style.left = (e.clientX + 14) + 'px';
-  tt.style.top = (e.clientY - 20) + 'px';
-  tt.classList.add('show');
-}
-function hideTooltip() { tt.classList.remove('show'); }
-document.addEventListener('mousemove', e => {
-  if (tt.classList.contains('show')) {
-    tt.style.left = (e.clientX + 14) + 'px';
-    tt.style.top = (e.clientY - 20) + 'px';
-  }
-});
-
-// ─── CAMPUS SWITCH ──────────────────────────────────────────────────────────
-function switchCampus(key, tabEl) {
-  currentCampus = key;
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  tabEl.classList.add('active');
-  document.querySelectorAll('.campus-section').forEach(s => s.classList.remove('active'));
-  document.getElementById(`campus-${key}`).classList.add('active');
-  updateStats();
+function openModal(roomId,d,s,hasSlot){
+  const room=findRoom(roomId);
+  const sl=hasSlot?room.slots[d+'-'+s]:null;
+  editingSlot={roomId,d,s};
+  document.getElementById('modal-title').textContent='Edit slot';
+  document.getElementById('modal-sub').textContent=`${DAYS[d]}  ·  ${SLOTS[s]}  ·  ${room.label}`;
+  document.getElementById('m-course').value=sl?sl.course:'';
+  document.getElementById('m-gender').value=sl?sl.gender:'M';
+  document.getElementById('m-cap').value=sl?sl.cap:room.cap;
+  document.getElementById('modal-bg').classList.add('open');
 }
 
-// ─── MODAL ──────────────────────────────────────────────────────────────────
-function openModal(campusKey, roomIdx, row, col) {
-  editTarget = { campusKey, roomIdx, row, col };
-  const cell = CAMPUSES[campusKey].rooms[roomIdx].grid[row][col];
-  const ts = TIME_SLOTS[row];
-  const room = CAMPUSES[campusKey].rooms[roomIdx];
-  document.getElementById('modalTitle').textContent =
-    `${room.name} · ${DAYS[col]} · ${ts.label}`;
-  document.getElementById('modalCourse').value = cell ? cell.course : '';
-  document.getElementById('modalGender').value = cell ? cell.gender : ts.gender;
-  document.getElementById('modalCap').value = cell ? cell.cap : room.cap;
-  document.getElementById('modalOverlay').classList.add('show');
+function closeModal(){document.getElementById('modal-bg').classList.remove('open');editingSlot=null;}
+
+function saveSlot(){
+  if(!editingSlot)return;
+  const course=document.getElementById('m-course').value;
+  const room=findRoom(editingSlot.roomId);
+  const key=editingSlot.d+'-'+editingSlot.s;
+  if(!course){delete room.slots[key];}
+  else{room.slots[key]={course,gender:document.getElementById('m-gender').value,cap:parseInt(document.getElementById('m-cap').value)||room.cap};}
+  closeModal();render();
 }
 
-function saveSlot() {
-  const { campusKey, roomIdx, row, col } = editTarget;
-  const course = document.getElementById('modalCourse').value;
-  const gender = document.getElementById('modalGender').value;
-  const cap = parseInt(document.getElementById('modalCap').value) || 0;
-  CAMPUSES[campusKey].rooms[roomIdx].grid[row][col] = course ? { course, gender, cap } : null;
-  closeModalDirect();
-  renderCampus(campusKey);
-  updateStats();
+function clearSlot(){
+  if(!editingSlot)return;
+  const room=findRoom(editingSlot.roomId);
+  delete room.slots[editingSlot.d+'-'+editingSlot.s];
+  closeModal();render();
 }
 
-function clearSlot() {
-  const { campusKey, roomIdx, row, col } = editTarget;
-  CAMPUSES[campusKey].rooms[roomIdx].grid[row][col] = null;
-  closeModalDirect();
-  renderCampus(campusKey);
-  updateStats();
-}
-
-function closeModal(e) { if (e.target === document.getElementById('modalOverlay')) closeModalDirect(); }
-function closeModalDirect() {
-  document.getElementById('modalOverlay').classList.remove('show');
-  editTarget = null;
-}
-
-// ─── IMPORT / EXPORT ────────────────────────────────────────────────────────
-function exportJSON() {
-  const data = JSON.stringify(CAMPUSES, null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'bano_qabil_batch2_schedule.json';
+function exportData(){
+  const data={exported:new Date().toISOString(),campuses:{}};
+  Object.entries(campuses).forEach(([key,c])=>{
+    data.campuses[key]={name:c.name,rooms:c.rooms.map(r=>({id:r.id,label:r.label,type:r.type,cap:r.cap,slots:r.slots}))};
+  });
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='bano_qabil_batch2_data.json';
   a.click();
 }
 
-function importJSON() { document.getElementById('importFile').click(); }
-
-function handleImport(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      const data = JSON.parse(ev.target.result);
-      Object.assign(CAMPUSES.darussalam.rooms[0], { grid: data.darussalam?.rooms?.[0]?.grid ?? CAMPUSES.darussalam.rooms[0].grid });
-      Object.assign(CAMPUSES.darussalam.rooms[1], { grid: data.darussalam?.rooms?.[1]?.grid ?? CAMPUSES.darussalam.rooms[1].grid });
-      Object.assign(CAMPUSES.darussalam.rooms[2], { grid: data.darussalam?.rooms?.[2]?.grid ?? CAMPUSES.darussalam.rooms[2].grid });
-      Object.assign(CAMPUSES.islamic.rooms[0], { grid: data.islamic?.rooms?.[0]?.grid ?? CAMPUSES.islamic.rooms[0].grid });
-      Object.assign(CAMPUSES.islamic.rooms[1], { grid: data.islamic?.rooms?.[1]?.grid ?? CAMPUSES.islamic.rooms[1].grid });
-      renderAll();
-      alert('Schedule imported successfully!');
-    } catch { alert('Invalid JSON file.'); }
-  };
-  reader.readAsText(file);
-  e.target.value = '';
-}
-
-// ─── INIT ────────────────────────────────────────────────────────────────────
-renderAll();
+document.getElementById('modal-bg').addEventListener('click',function(e){if(e.target===this)closeModal();});
+render();
 </script>
 </body>
 </html>
